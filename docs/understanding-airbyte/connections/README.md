@@ -3,7 +3,7 @@
 A connection is a configuration for syncing data between a source and a destination. To setup a connection, a user must configure things such as:
 
 * Sync schedule: when to trigger a sync of the data.
-* Namespace and stream names in the destination: where the data will end up being written.
+* Destination [Namespace](../namespaces.md) and stream names: where the data will end up being written.
 * A catalog selection: which [streams and fields](../catalog.md) to replicate from the source.
 * Sync mode: how each stream should be replicated (read & write behaviors).
 
@@ -25,63 +25,7 @@ When a scheduled connection is first created, a sync is executed as soon as poss
 
 ## Destination namespace
 
-The location of where a connection replication will store data is referenced as the destination namespace. The destination connectors should create and write records (for both raw and normalized tables) in the specified namespace which should be configurable in the UI thanks to the Namespace Configuration field (or NamespaceDefinition in the API).
-
-The available options are:
-
-### - Mirror source structure
-
-Some sources (such as databases based on JDBC for example) are providing namespace informations from which a stream has been extracted from. Whenever a source is able to fill this field in the catalog.json file, the destination will try to reproduce exactly the same namespace when this configuraton is set.
-For sources or streams where the source namespace is not known, the behavior will fall back to the "Destination Connector settings".
-
-### - Destination connector settings
-
-All stream will be replicated and store in the default namespace defined on the destination settings page.
-In the destinations, namespace refers to:
-
-| Destination Connector | Namespace setting |
-| :--- | :--- |
-| BigQuery | my_schema |
-| MSSQL | schema |
-| MySql | database |
-| Postgres | schema |
-| Oracle | schema |
-| Redshift | schema |
-| Snowflake | schema |
-
-### - Custom format
-
-When replicating multiple sources into the same destination, conflicts on tables being overwritten by syncs can occur.
-
-For example, a Github source can be replicated into a "github" schema.
-But if we have multiple connections to different GitHub repositories (similar in multi-tenant scenarios):
-
-- we'd probably wish to keep the same table names (to keep consistent queries downstream)
-- but store them in different namespaces (to avoid mixing data from different "tenants")
-
-To solve this, we can either:
-
-- use a specific namespace for each connection, thus this option of custom format.
-- or, use prefix to stream names as described below.
-
-Note that we can use a template format string using variables that will be resolved during replication as follow:
-
-- `${SOURCE_NAMESPACE}`: will be replaced by the namespace provided by the source if available
-
-### Examples
-
-Here are examples of replication configurations between a Postgres Source and Snowflake Destination (with settings of schema = "my_schema"):
-
-| Namespace Configuration | Source Namespace | Source Table Name | Destination Namespace | Destination Table Name |
-| :--- | :--- | :--- | :--- | :--- |
-| Mirror source structure | public | my_table | public | my_table |
-| Mirror source structure | | my_table | my_schema | my_table |
-| Destination connector settings | public | my_table | my_schema | my_table |
-| Destination connector settings | | my_table | my_schema | my_table |
-| Custom format = "custom" | public | my_table | custom | my_table |
-| Custom format = "${SOURCE_NAMESPACE}" | public | my_table | public | my_table |
-| Custom format = "my_${SOURCE_NAMESPACE}_schema" | public | my_table | my_public_schema | my_table |
-| Custom format = "   " | public | my_table | my_schema | my_table |
+The location of where a connection replication will store data is referenced as the destination namespace. The destination connectors should create and write records (for both raw and normalized tables) in the specified namespace which should be configurable in the UI thanks to the Namespace Configuration field (or NamespaceDefinition in the API). You can read more about configuring namespaces [here](../namespaces.md).
 
 ## Destination stream name
 
