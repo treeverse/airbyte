@@ -1,16 +1,11 @@
 # Connections
 
-A connection is a configuration for syncing data between a source and a destination. To setup a connection, a user must configure things such such as:
+A connection is a configuration for syncing data between a source and a destination. To setup a connection, a user must configure things such as:
 
-* A catalog selection: which [streams and fields](../catalog.md) to replicate from the source
-* Sync mode: Whether streams should be replicated using:
-  * [Full Refresh Overwrite](full-refresh-overwrite.md): Sync the whole stream and replace data in destination by overwriting it.
-  * [Full Refresh Append](full-refresh-append.md): Sync the whole stream and append data in destination.
-  * [Incremental Append](incremental-append.md): Sync new records from stream and append data in destination.
-  * [Incremental Deduped History](incremental-deduped-history.md): Sync new records from stream and append data in destination, also provides a deduplicated view mirroring the state of the stream in the source.
-* Sync schedule: when to trigger a sync of the data
-
-Sync schedules are explained below. For information about catalog selections, see [AirbyteCatalog & ConfiguredAirbyteCatalog](../catalog.md).
+* Sync schedule: when to trigger a sync of the data.
+* Namespace and stream names in the destination: where the data will end up in the destination.
+* A catalog selection: which [streams and fields](../catalog.md) to replicate from the source.
+* Sync mode: how each stream should be replicated (read & write behaviors).
 
 ## Sync schedules
 
@@ -21,10 +16,36 @@ Syncs will be triggered by either:
 
 When a scheduled connection is first created, a sync is executed as soon as possible. After that, a sync is run once the time since the last sync \(whether it was triggered manually or due to a schedule\) has exceeded the schedule interval. For example, consider the following illustrative scenario:
 
-* **October 1st, 2pm**, a user sets up a connection to sync data every 24 hours. 
-* **October 1st, 2:01pm**: sync job runs 
-* **October 2nd, 2:01pm:** 24 hours have passed since the last sync, so a sync is triggered. 
+* **October 1st, 2pm**, a user sets up a connection to sync data every 24 hours.
+* **October 1st, 2:01pm**: sync job runs
+* **October 2nd, 2:01pm:** 24 hours have passed since the last sync, so a sync is triggered.
 * **October 2nd, 5pm**: The user manually triggers a sync from the UI
 * **October 3rd, 2:01pm:** since the last sync was less than 24 hours ago, no sync is run
 * **October 3rd, 5:01pm:** It has been more than 24 hours since the last sync, so a sync is run
 
+## Namespace and stream names
+
+
+
+## Sync modes
+
+A sync mode governs how Airbyte reads from a source and writes to a destination. Airbyte provides different sync modes to account for various use cases. To minimize confusion, a mode's behavior is reflected in its name. The easiest way to understand Airbyte's sync modes is to understand how the modes are named.
+
+1.  The first part of the name denotes how the source connector reads data from the source:
+
+* Incremental: Read records added to the source since the last sync job. (The first sync using Incremental is equivalent to a Full Refresh)
+  * Method 1: Using a cursor. Generally supported by all sources.
+  * Method 2: Using change data capture. Only supported by some sources. See [CDC](../cdc.md) for more info.
+* Full Refresh: Read everything in the source.
+
+2. The second part of the sync mode name denotes how the destination connector writes data. This is not affected by how the source connector produced the data:
+
+* Overwrite: Overwrite by first deleting existing data in the destination.
+* Append: Write by adding data to existing tables in the destination.
+* Deduped History: Write by first adding data to existing tables in the destination to keep a history of changes. The final table is produced by de-duplicating the intermediate ones using a primary key.
+
+A sync mode is therefore, a combination of a source and destination mode together. The UI exposes the following options, whenever both source and destination connectors are capable to support it for the corresponding stream:
+* [Full Refresh Overwrite](full-refresh-overwrite.md): Sync the whole stream and replace data in destination by overwriting it.
+* [Full Refresh Append](full-refresh-append.md): Sync the whole stream and append data in destination.
+* [Incremental Append](incremental-append.md): Sync new records from stream and append data in destination.
+* [Incremental Deduped History](incremental-deduped-history.md): Sync new records from stream and append data in destination, also provides a de-duplicated view mirroring the state of the stream in the source.
