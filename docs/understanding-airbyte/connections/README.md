@@ -25,15 +25,15 @@ When a scheduled connection is first created, a sync is executed as soon as poss
 
 ## Destination namespace
 
-The location of where a connection replication will store data is referenced as the destination namespace. The destination connectors should create and write records (for both raw and normalized tables) in the specified namespace which should be configurable in the UI thanks to the Namespace Configuration field (or NamespaceDefinition in the API). You can read more about configuring namespaces [here](../namespaces.md).
+The location of where a connection replication will store data is referenced as the destination namespace. The destination connectors should create and write records (for both raw and normalized tables) in the specified namespace which should be configurable in the UI via the Namespace Configuration field (or NamespaceDefinition in the API). You can read more about configuring namespaces [here](../namespaces.md).
 
 ## Destination stream name
 
 ### Prefix stream name
 
-Stream names refers to table names in a typical RDBMS. But it can also be the name of an API endpoint etc. Similarly to the namespace, stream names can be configured to diverge from their names in the source with a "prefix" field. The prefix is prepended to the source stream name in the destination.
+Stream names refer to table names in a typical RDBMS. But it can also be the name of an API endpoint, etc. Similarly to the namespace, stream names can be configured to diverge from their names in the source with a "prefix" field. The prefix is prepended to the source stream name in the destination.
 
-## Stream by stream customization
+## Stream-specific customization
 
 All the customization of namespace and stream names described above will be equally applied to all streams selected for replication in a catalog per connection. If you need more granular customization, stream by stream, for example, or with different logic rules, then you could follow the tutorial on [customizing transformations with dbt](../../tutorials/transformation-and-normalization/transformations-with-dbt.md).
 
@@ -44,7 +44,7 @@ A sync mode governs how Airbyte reads from a source and writes to a destination.
 1.  The first part of the name denotes how the source connector reads data from the source:
 
 * Incremental: Read records added to the source since the last sync job. (The first sync using Incremental is equivalent to a Full Refresh)
-  * Method 1: Using a cursor. Generally supported by all sources.
+  * Method 1: Using a cursor. Generally supported by all connectors whose data source allows extracting records incrementally.
   * Method 2: Using change data capture. Only supported by some sources. See [CDC](../cdc.md) for more info.
 * Full Refresh: Read everything in the source.
 
