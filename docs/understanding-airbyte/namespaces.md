@@ -30,13 +30,14 @@ In the destinations, namespace refers to:
 
 | Destination Connector | Namespace setting |
 | :--- | :--- |
-| BigQuery | my_schema |
+| BigQuery | dataset |
 | MSSQL | schema |
 | MySql | database |
 | Oracle DB | schema |
 | Postgres | schema |
 | Redshift | schema |
 | Snowflake | schema |
+| S3 | path prefix |
 
 ### - Custom format
 
@@ -97,3 +98,4 @@ The following table summarises how this works. We assume an example of replicati
 * Postgres
 * Redshift
 * Snowflake
+* S3
